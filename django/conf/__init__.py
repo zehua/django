@@ -41,6 +41,7 @@ class LazySettings(LazyObject):
                 "or call settings.configure() before accessing settings."
                 % (desc, ENVIRONMENT_VARIABLE))
 
+        print 'creating Settings from', settings_module
         self._wrapped = Settings(settings_module)
 
     def __getattr__(self, name):
@@ -81,6 +82,9 @@ class BaseSettings(object):
 
 class Settings(BaseSettings):
     def __init__(self, settings_module):
+        print 'settings_module:', settings_module
+        print 'global_settings:', dir(global_settings)
+        print 'global_settings.SECRET_KEY:', getattr(global_settings, 'SECRET_KEY', 'not found')
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
             if setting.isupper():
@@ -98,9 +102,14 @@ class Settings(BaseSettings):
             "LOCALE_PATHS",
         )
         self._explicit_settings = set()
+        print 'mod:', mod.__file__
+        print 'dir(mod):', dir(mod)
+        print 'mod.SECRET_KEY:', getattr(mod, 'SECRET_KEY', 'not found')
         for setting in dir(mod):
+            print 'key', setting, setting.isupper()
             if setting.isupper():
                 setting_value = getattr(mod, setting)
+                print ' value', setting_value
 
                 if (setting in tuple_settings and
                         isinstance(setting_value, six.string_types)):

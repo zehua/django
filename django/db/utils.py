@@ -197,6 +197,7 @@ class ConnectionHandler(object):
         except KeyError:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
 
+        print 'in prepare_test_settings, cond:', conn
         test_dict_set = 'TEST' in conn
         test_settings = conn.setdefault('TEST', {})
         old_test_settings = {}
@@ -211,7 +212,7 @@ class ConnectionHandler(object):
                 if test_settings != old_test_settings:
                     raise ImproperlyConfigured(
                         "Connection '%s' has mismatched TEST and TEST_* "
-                        "database settings." % alias)
+                        "database settings. %s\nvs\n%s" % (alias, str(test_settings), str(old_test_settings)))
             else:
                 test_settings.update(old_test_settings)
                 for key, _ in six.iteritems(old_test_settings):

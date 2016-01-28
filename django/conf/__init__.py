@@ -83,8 +83,6 @@ class BaseSettings(object):
 class Settings(BaseSettings):
     def __init__(self, settings_module):
         print 'settings_module:', settings_module
-        print 'global_settings:', dir(global_settings)
-        print 'global_settings.SECRET_KEY:', getattr(global_settings, 'SECRET_KEY', 'not found')
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
             if setting.isupper():
@@ -106,10 +104,10 @@ class Settings(BaseSettings):
         print 'dir(mod):', dir(mod)
         print 'mod.SECRET_KEY:', getattr(mod, 'SECRET_KEY', 'not found')
         for setting in dir(mod):
-            print 'key', setting, setting.isupper()
+            if setting.startswith('SECRET') or setting.startswith('DATABASES'): print 'key', setting, setting.isupper()
             if setting.isupper():
                 setting_value = getattr(mod, setting)
-                print ' value', setting_value
+                if setting.startswith('SECRET') or setting.startswith('DATABASES'): print ' value', setting_value
 
                 if (setting in tuple_settings and
                         isinstance(setting_value, six.string_types)):
@@ -118,6 +116,8 @@ class Settings(BaseSettings):
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
+        mod2 = importlib.import_module('zopim_web.tests.web.settings')
+        print 'mod2.SECRET_KEY:', getattr(mod2, 'SECRET_KEY', 'not found')
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
